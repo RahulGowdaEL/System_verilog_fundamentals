@@ -38,3 +38,42 @@ module test;
     end
   end
 endmodule
+
+//without using system task reverse , the string
+
+class A;
+  rand int a[];
+
+  constraint c1 {
+    a.size == 10;
+    foreach (a[i]) a[i] inside {[1:20]};
+  }
+
+  function void post_randomize();
+    $display("Original array: %p", a);
+    reverse_inline();
+    $display("Reversed array: %p", a);
+  endfunction
+
+function void reverse_inline();
+  for(int i = 0; i < a.size() / 2; i++) begin
+    
+    int j = a.size() - 1 - i;
+    $display("value of max is %p", j);
+    a[i] = a[i] ^ a[j];
+    a[j] = a[i] ^ a[j];
+    a[i] = a[i] ^ a[j];
+  end
+endfunction
+  
+endclass
+
+module test;
+  A obj = new();
+  initial begin
+    if (obj.randomize()) begin
+      $display("Reversed array in module: %p", obj.a);
+    end else
+      $display("Randomization failed");
+  end
+endmodule
